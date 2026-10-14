@@ -1,4 +1,5 @@
 import rich
+from rich.layout import Layout
 from rich.console import Console
 from rich.panel import Panel
 from faker import Faker
@@ -37,15 +38,14 @@ def check_yn_answer(val) -> bool:
         return False
     else:
         console.print('[bold red]Invalid answer. Answer with only yes or no.[/bold red]')
-        yn = console.input("[dim][Y/n][/dim]")
+        yn = console.input("[dim][Y/n] [/dim]")
         return check_yn_answer(yn)
-
 def setup():
     global time, num_sentence, len_sentence
     settings = check_json('settings.json')
     if settings is not None:
         console.print('[bold yellow]Do you want to keep your previous setting?[/bold yellow]')
-        yn = console.input("[dim][Y/n][/dim]")
+        yn = console.input("[dim][Y/n] [/dim]")
         if check_yn_answer(yn):
             console.print('[bold green]Keeping previous settings.[/bold green]')
             time = settings['time']
@@ -70,5 +70,20 @@ def setup():
     data = {'time': int(length), 'num_sentence': int(num_sentence), 'len_sentence': int(len_sentence)}
     with open('settings.json', 'w') as file:
         json.dump(data, file)
-start_time = time.time()
+def create_game_screen():
+    layout = Layout()
+    layout.split_row(Layout(name='game', ratio=1))
+    layout["game"].update(
+            Panel(
+                "[bold blue]SpeedWriter[/bold blue]\n\n" + f"You have {time} seconds to type the following sentences:\n"
+                "Start typing fast!!\n\n" + "[bold yellow]Sentences: [/bold yellow]\n" + "".join([f"{sentence}\n" for sentence in generate_sentences(num_sentence=num_sentence, len_sentence=len_sentence)]),
+                title="Game"
+            )
+        )
+    console.print(layout)
+def start():
+    console.input("[yellow]Press Enter to start.[/yellow] ")
+    create_game_screen()
+
 setup()
+start()
