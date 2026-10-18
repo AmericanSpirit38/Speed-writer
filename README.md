@@ -1,43 +1,58 @@
 # SpeedWriter
 
-A terminal-based typing speed game built with **Python** and **Rich**.
-
-SpeedWriter generates random sentences and lets you type them under a time limit, then shows:
-
-- **WPM (Words Per Minute)**
-- **Mistakes**
-- **Accuracy**
+A terminal typing speed game built with Python, Rich, and Faker.
 
 ## Features
 
-- Colorful terminal UI using [`rich`](https://github.com/Textualize/rich)
-- Random sentence generation using [`faker`](https://faker.readthedocs.io/)
-- Configurable:
-  - game length (seconds)
-  - number of sentences
-  - sentence length (words)
-- Settings persistence in `settings.json`
-- Character-by-character typing input (Windows) via `msvcrt`
-- Replay prompt after each game
-
-## Project Structure
-
-- `start.py` - main game script
-- `settings.json` - saved game settings (created/updated automatically)
+- Random sentence generation
+- Countdown and timed typing session
+- WPM, mistakes, and accuracy output
+- Saved settings in `settings.json`
+- Replay prompt after each round
 
 ## Requirements
 
-- Python **3.9+** (recommended)
-- Windows (current input implementation uses `msvcrt`)
+- Python 3.9+
+- Windows (input uses `msvcrt`)
 
-Python packages:
+## Project Files
 
-- `rich`
-- `faker`
+- `start.py`: game logic
+- `speedwriter/__main__.py`: package entry point
+- `requirements.txt`: dependency list
+- `pyproject.toml`: package metadata and console script
 
-## Installation
+## Quick Start
 
-Install dependencies:
+Install from source and run the command:
 
 ```powershell
-pip install rich faker
+python -m pip install .
+speedwriter
+```
+
+For development mode (editable install):
+
+```powershell
+python -m pip install -e .
+speedwriter
+```
+
+If you only want dependencies without installing the package:
+
+```powershell
+python -m pip install -r requirements.txt
+python .\start.py
+```
+
+## How It Works
+
+1. Choose existing settings or enter new values.
+2. Press Enter to begin.
+3. Type until time runs out or you press Enter.
+4. Review results and choose whether to play again.
+
+## Notes
+
+- `console.input()` is line-based, so Enter submits the line.
+- Real-time key capture is handled with `msvcrt.kbhit()` + `msvcrt.getwch()`.

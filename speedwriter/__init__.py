@@ -1,0 +1,2 @@
+"""SpeedWriter package."""
+
