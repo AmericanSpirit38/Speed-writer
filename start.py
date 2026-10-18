@@ -90,6 +90,10 @@ def measure_time(start_time: float) -> float:
     return time.time() - start_time
 
 def get_user_input(start_time: float, time_limit: float) -> list:
+<<<<<<< HEAD
+=======
+
+>>>>>>> origin/master
     chars = []
     while measure_time(start_time) < time_limit:
         if msvcrt.kbhit():
