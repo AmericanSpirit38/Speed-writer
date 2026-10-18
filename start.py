@@ -1,3 +1,4 @@
+from pygments.lexer import words
 from rich.layout import Layout
 from rich.console import Console
 from rich.panel import Panel
@@ -76,12 +77,14 @@ def setup():
         json.dump(data, file)
         return None
 def create_game_screen():
+    global sentences
+    sentences = generate_sentences(num_sentence=int(num_sentence), len_sentence=int(len_sentence))
     layout = Layout()
     layout.split_row(Layout(name='game', ratio=1))
     layout["game"].update(
             Panel(
                 "[bold blue]SpeedWriter[/bold blue]\n\n" + f"You have {game_length} seconds to type the following sentences:\n"
-                + "Start typing fast!!\n\n" + "[bold yellow]Sentences: [/bold yellow]\n" + "".join([f"{sentence}\n" for sentence in generate_sentences(num_sentence=int(num_sentence), len_sentence=int(len_sentence))]),
+                + "Start typing fast!!\n\n" + "[bold yellow]Sentences: [/bold yellow]\n" + "".join([f"{sentence}\n" for sentence in sentences]),
                 title="Game"
             )
         )
@@ -104,13 +107,45 @@ def get_user_input(start_time: float, time_limit: float) -> list:
                 chars.append(ch)
             print(ch, end='', flush=True)
     return ''.join(chars)
+def calculate_mistakes(inp, sentences):
+    mistakes = 0
+    splitsentence = [sentence.replace('.', '').replace(',', '').split(' ') for sentence in sentences]
+    words = []
+    for sentence in splitsentence:
+        words.extend(sentence)
+    inp = inp.lower().split()
+    for i, wrd in enumerate(inp):
+        if wrd != words[i].lower() and wrd not in words[i].lower():
+            mistakes += 1
+    return mistakes
+
+def evaluate(inp, game_length, sentences):
+    wpm = (len(inp)/5) / (game_length/60)
+    console.clear()
+    console.print(f"[bold green]Your WPM: {wpm:.2f}[/bold green]")
+    mistakes = calculate_mistakes(inp, sentences)
+    accuracy = mistakes / len(inp.split(" ")) * 100
+    console.print(f"[bold red]Mistakes: {mistakes}[/bold red]")
+    console.print(f"[bold blue]Accuracy: {accuracy:.2f}%[/bold blue]")
+
+    console.clear()
+
+def play_again_question():
+    return console.input("[yellow]Do you want to play again? (y/n): [/yellow] ").lower() in ['y', 'yes', '1']
 
 def start():
     console.input("[yellow]Press Enter to start.[/yellow] ")
     countdown(3)
     create_game_screen()
-    typed_text = get_user_input(start_time=time.time(), time_limit=float(game_length))
+    start_time = time.time()
+    typed_text = get_user_input(start_time=start_time, time_limit=float(game_length))
+    time_typed = measure_time(start_time=start_time)
     console.print(f"\n[bold cyan]You typed: [/bold cyan] {typed_text}")
+    evaluate(typed_text, float(time_typed), sentences=sentences)
+    if play_again_question():
+        setup()
+        start()
+
 
 # CODE 
 setup()
