@@ -147,6 +147,6 @@ def start():
         start()
 
 
-# CODE 
-setup()
-start()
+if __name__ == "__main__":
+    setup()
+    start()
