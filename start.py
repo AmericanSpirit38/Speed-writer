@@ -1,4 +1,3 @@
-from pygments.lexer import words
 from rich.layout import Layout
 from rich.console import Console
 from rich.panel import Panel
@@ -9,7 +8,6 @@ import msvcrt
 
 gen = Faker()
 console = Console()
-console.print(Panel.fit("SpeedWriter", style="bold blue"))
 
 def countdown(num_sec):
     for i in range(num_sec, 0, -1):
@@ -92,7 +90,7 @@ def create_game_screen():
 def measure_time(start_time: float) -> float:
     return time.time() - start_time
 
-def get_user_input(start_time: float, time_limit: float) -> list:
+def get_user_input(start_time: float, time_limit: float) -> str:
     chars = []
     while measure_time(start_time) < time_limit:
         if msvcrt.kbhit():
@@ -107,7 +105,7 @@ def get_user_input(start_time: float, time_limit: float) -> list:
                 chars.append(ch)
             print(ch, end='', flush=True)
     return ''.join(chars)
-def calculate_mistakes(inp, sentences):
+def calculate_mistakes(inp: str, sentences: list[str]) -> int:
     mistakes = 0
     splitsentence = [sentence.replace('.', '').replace(',', '').split(' ') for sentence in sentences]
     words = []
@@ -115,11 +113,14 @@ def calculate_mistakes(inp, sentences):
         words.extend(sentence)
     inp = inp.lower().split()
     for i, wrd in enumerate(inp):
+        if i >= len(words):
+            mistakes += 1
+            continue
         if wrd != words[i].lower() and wrd not in words[i].lower():
             mistakes += 1
     return mistakes
 
-def evaluate(inp, game_length, sentences):
+def evaluate(inp: str, game_length: float, sentences: list[str]):
     wpm = (len(inp)/5) / (game_length/60)
     console.clear()
     console.print(f"[bold green]Your WPM: {wpm:.2f}[/bold green]")
@@ -134,6 +135,7 @@ def play_again_question():
     return console.input("[yellow]Do you want to play again? (y/n): [/yellow] ").lower() in ['y', 'yes', '1']
 
 def start():
+    console.print(Panel.fit("SpeedWriter", style="bold blue"))
     console.input("[yellow]Press Enter to start.[/yellow] ")
     countdown(3)
     create_game_screen()
